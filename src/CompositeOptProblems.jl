@@ -1,4 +1,4 @@
-module CompositeOptProblems
+module CompositeProblems
 
 # Write your package code here.
 

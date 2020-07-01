@@ -1,6 +1,6 @@
-using CompositeOptProblems
+using CompositeProblems
 using Test
 
-@testset "CompositeOptProblems.jl" begin
+@testset "CompositeProblems.jl" begin
     # Write your tests here.
 end

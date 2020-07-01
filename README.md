@@ -1,1 +1,1 @@
-# CompositeOptProblems
+# CompositeProblems
