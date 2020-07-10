@@ -1,7 +1,8 @@
 module CompositeProblems
 
 using LinearAlgebra
-import StructuredProximalOperators: g, prox_αg!, prox_αg, ∇M_g!, ∇M_g, ∇²M_g_ξ!, ∇²M_g_ξ
+import StructuredProximalOperators:
+    Manifold, g, prox_αg!, prox_αg, ∇M_g!, ∇M_g, ∇²M_g_ξ!, ∇²M_g_ξ
 using StructuredProximalOperators
 using Random
 using Distributions
@@ -14,6 +15,10 @@ abstract type CompositeProblem end
 ##
 function problem_dimension(pb::CompositeProblem)
     return error("problem_dimension not implemented for a problem $(typeof(pb)).")
+end
+
+function F(pb::CompositeProblem, x)
+    return f(pb, x) + g(pb, x)
 end
 
 
@@ -62,14 +67,16 @@ prox_αg(pb::CompositeProblem, x, α) = prox_αg(pb.regularizer, x, α)
 
 
 export CompositeProblem
+export F
 export f, ∇f!, ∇f, ∇²f_h!, ∇²f_h
 export get_gradlips, get_μ_cvx
 export g, prox_αg!, prox_αg, ∇M_g!, ∇M_g, ∇²M_g_ξ!, ∇²M_g_ξ
 export problem_dimension
 
 
-include("problems/Lasso.jl")
-export get_lasso
+include("problems/Leastsquares.jl")
+export LeastsquaresPb
+export get_random_qualifiedleastsquares, get_randomlasso
 
 
 end
