@@ -76,7 +76,7 @@ export problem_dimension
 
 include("problems/Leastsquares.jl")
 export LeastsquaresPb
-export get_random_qualifiedleastsquares, get_randomlasso
+export get_random_qualifiedleastsquares, get_random_qualifiedlasso
 
 
 end

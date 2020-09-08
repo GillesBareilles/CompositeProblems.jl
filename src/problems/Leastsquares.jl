@@ -111,12 +111,11 @@ function get_random_qualifiedleastsquares(n, m, regularizer, sparsity; seed = 12
     return LeastsquaresPb(A, y, regularizer, n, x0, M0)
 end
 
-function get_randomlasso(n, m, sparsity; seed = 1234)
+function get_random_qualifiedlasso(n, m, sparsity; seed = 1234)
     return get_random_qualifiedleastsquares(
         n,
         m,
         regularizer_l1,
-        NamedTuple(),
         sparsity;
         seed = seed,
     )
