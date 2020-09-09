@@ -15,10 +15,14 @@ problem_dimension(pb::LeastsquaresPb) = pb.n
 ## f
 # 0th order
 f(pb::LeastsquaresPb, x) = 0.5 * norm(pb.A * x - pb.y)^2
+f(pb::LeastsquaresPb, x::AbstractMatrix) = f(pb, view(x, :))
 
 # 1st order
 ∇f!(pb::LeastsquaresPb, res, x) = (res .= transpose(pb.A) * (pb.A * x - pb.y))
 ∇f(pb::LeastsquaresPb, x) = transpose(pb.A) * (pb.A * x - pb.y)
+
+∇f!(pb::LeastsquaresPb, res, x::AbstractMatrix) = ∇f!(pb, view(res, :), view(x, :))
+∇f(pb::LeastsquaresPb, x::AbstractMatrix) = reshape(transpose(pb.A) * (pb.A * view(x, :) - pb.y), size(x))
 
 # 2nd order
 ∇²f_h!(pb::LeastsquaresPb, res, x, h) = (res .= transpose(pb.A) * (pb.A * h))
@@ -56,8 +60,20 @@ function build_original_signal(reg::regularizer_distball, n, sparsity, seed)
     return x0, PSphere(reg.p, reg.r, n)
 end
 
-function build_original_signal(reg::regularizer_group{Tr}, n, sparsity, seed) where {Tr}
+function build_original_signal(reg::regularizer_lnuclear, mn, sparsity, seed)
+    m, n = mn
 
+    Random.seed!(seed)
+    x0 = rand(Normal(), m, n)
+
+    F = svd(x0)
+    x0 = F.U[:, 1:sparsity] * Diagonal(F.S[1:sparsity]) * F.Vt[1:sparsity, :]
+
+    return vec(x0), FixedRankMatrices(m, n, sparsity)
+end
+
+
+function build_original_signal(reg::regularizer_group{Tr}, n, sparsity, seed) where {Tr}
     x0 = zeros(n)
     Ms = []
     for (i, group) in enumerate(reg.groups)
@@ -91,32 +107,33 @@ Build a least-squares problem that fits the signal recovery framework. The optim
 problem solution should be close to the original signal `x0` and lie exactly on the same
 optimal manifold `M_x0`.
 """
-function get_random_qualifiedleastsquares(n, m, regularizer, sparsity; seed = 1234)
+function get_random_qualifiedleastsquares(n, m, regularizer, sparsity; seed = 1234, A=nothing, delta = 0.01)
     # A is drawn from the standard normal distribution
     # b = Ax0 + e where e is taken from the normal distribution with standard deviation 0.001.
     # We set λ1 so that the original sparsity is ultimately recovered.
+    n_vectorialpb = isa(n, Tuple) ? n[1]*n[2] : n
 
     Random.seed!(seed)
-    A = rand(Normal(), m, n)
+    if isnothing(A)
+        A = rand(Normal(), m, n_vectorialpb)
+    end
 
     x0, M0 = build_original_signal(regularizer, n, sparsity, seed)
 
-    delta = 0.01
     Random.seed!(seed + 3)
     e = rand(Normal(0, delta^2), m)
 
     y = A * x0 + e
 
     update_regularizationstrength!(regularizer, delta)
-    return LeastsquaresPb(A, y, regularizer, n, x0, M0)
+    return LeastsquaresPb(A, y, regularizer, n_vectorialpb, x0, M0)
 end
 
 function get_randomlasso(n, m, sparsity; seed = 1234)
     return get_random_qualifiedleastsquares(
         n,
         m,
-        regularizer_l1,
-        NamedTuple(),
+        regularizer_l1(1.0),
         sparsity;
         seed = seed,
     )
@@ -142,28 +159,3 @@ end
 #             !(i in inds_nz) && (x0[T*i-3:T*i] .= 0)
 #         end
 #         !(ngroups in inds_nz) && (x0[T*ngroups-3:end] .= 0)
-
-#     elseif reg == regularizer_lnuclear
-#         n_mat = Int(sqrt(n))
-
-#         Random.seed!(seed)
-#         basisvecs = rand(Normal(), n_mat, sparsity)
-
-#         x0 = zeros(n)
-#         for sp in 1:sparsity
-#             x0 += vec(basisvecs[:, sp] * transpose(basisvecs[:, sp]))
-#         end
-
-#     else
-#         @error "hunhandled regularizer $reg"
-#     end
-
-#     delta = 0.01
-#     Random.seed!(seed)
-#     e = rand(Normal(0, delta^2), m)
-
-#     y = A*x0+e
-#     pb = LassoPb{reg}(A, y, delta, n, x0)
-
-#     return pb
-# end
