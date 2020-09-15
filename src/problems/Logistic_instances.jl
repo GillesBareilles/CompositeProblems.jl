@@ -41,12 +41,12 @@ end
 
 
 ## Random sparse logit
-function get_logit(;n=80, m=85, sparsity=0.5, μ=0.1, seed=1234)
+function get_random_logit(;n=80, m=85, sparsity=0.5, μ=0.1, seed=1234)
 
     Random.seed!(seed)
     A = rand(m, n)*10
     Random.seed!(seed+3)
-    y = Vector([rand() > sparsity ? 1.0 : 0.0 for i in 1:m])
+    y = Vector([rand() > sparsity ? 1.0 : -1.0 for i in 1:m])
 
     return LogisticPb(A, y, regularizer_l1(μ), n, zeros(1), l1Manifold(zeros(1)))
 end

@@ -32,7 +32,7 @@ function ∇f!(pb::CompositeProblem, res, x)
     return error("∇f! not implemented for a problem $(typeof(pb)), result $(typeof(res)) and point $(typeof(x)).")
 end
 function ∇f(pb::CompositeProblem, x)
-    res = zeros(x)
+    res = zeros(size(x))
     ∇f!(pb, res, x)
     return res
 end
@@ -41,8 +41,8 @@ end
 function ∇²f_h!(pb::CompositeProblem, res, x, h)
     return error("∇²f_h! not implemented for a problem $(typeof(pb)), result $(typeof(res)), point $(typeof(x)) and direction $(typeof(h)).")
 end
-function ∇²_h(pb::CompositeProblem, x, h)
-    res = zeros(h)
+function ∇²f_h(pb::CompositeProblem, x, h)
+    res = zeros(size(h))
     ∇²f_h!(pb, res, x, h)
     return res
 end
@@ -87,6 +87,6 @@ export LeastsquaresPb
 export get_random_qualifiedleastsquares, get_random_qualifiedlasso
 
 export LogisticPb
-export get_logit_ionosphere, get_logit_gisette, get_logit
+export get_logit_ionosphere, get_logit_gisette, get_random_logit
 
 end
