@@ -11,6 +11,7 @@ using JLD
 
 abstract type CompositeProblem end
 
+const instances_dir = joinpath(dirname(pathof(CompositeProblems)), "..", "instances")
 
 ##
 function problem_dimension(pb::CompositeProblem)

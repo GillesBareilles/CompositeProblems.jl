@@ -1,7 +1,7 @@
 function get_logit_ionosphere(;λ=0.001)
     checkdownload_ionosphere()
 
-    rawdata = readdlm("instances/ionosphere.data", ',')
+    rawdata = readdlm(joinpath(instances_dir, "ionosphere.data"), ',')
     A = Matrix{Float64}(rawdata[:, 1:end-1])
     n = size(A, 2)
 
@@ -14,12 +14,15 @@ end
 function get_logit_gisette(λ = 6.67e-4)
     sampledim = 5000
 
-    if isfile("instances/gisette_scale.jld")
-        d = load("instances/gisette_scale.jld")
+    if isfile(joinpath(instances_dir, "gisette_scale.jld"))
+        d = load(joinpath(instances_dir, "gisette_scale.jld"))
         A = d["A"]
         y = d["y"]
     else
-        rawdata = readdlm("instances/gisette_scale", ' ')
+        println("Reading ", joinpath(instances_dir, "gisette_scale"))
+        rawdata = readdlm(joinpath(instances_dir, "gisette_scale"), ' ')
+
+        println("Assembling problem matrix, vector.")
         nsamples = size(rawdata, 1)
 
         A = zeros(Float64, nsamples, sampledim)
@@ -33,7 +36,9 @@ function get_logit_gisette(λ = 6.67e-4)
         end
 
         y = Vector{Float64}(rawdata[:, 1])
-        save("instances/gisette_scale.jld", "A", pb.A, "y", pb.y)
+
+        println("")
+        save(joinpath(instances_dir, "gisette_scale.jld"), "A", A, "y", y)
     end
 
     return LogisticPb(A, y, regularizer_l1(λ), sampledim, zeros(1), l1Manifold(zeros(1)))

@@ -1,12 +1,11 @@
 function checkdownload_ionosphere()
-    if !isfile("instances/ionosphere.data")
-        location = "instances"
-        println("Downloading ionosphere dataset to: ", location, "...")
+    if !isfile(joinpath(instances_dir, "ionosphere.data"))
+        println("Downloading ionosphere dataset to: ", pwd(), "...")
 
         run(`wget https://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.data`)
 
-        !isdir(location) && mkdir(location)
-        mv("ionosphere.data", joinpath(location, "ionosphere.data"))
+        mv("ionosphere.data", joinpath(instances_dir, "ionosphere.data"))
+        println("Moving ionosphere dataset to: ", joinpath(instances_dir, "ionosphere.data"), "...")
 
         println("All done.")
     end
