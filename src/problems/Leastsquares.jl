@@ -159,3 +159,21 @@ end
 #             !(i in inds_nz) && (x0[T*i-3:T*i] .= 0)
 #         end
 #         !(ngroups in inds_nz) && (x0[T*ngroups-3:end] .= 0)
+
+function get_lasso_MLE(;n=20, m=15, sparsity=0.5, δ=0.1, seed=1234)
+    @assert 0 ≤ sparsity ≤ 1
+
+    Random.seed!(seed)
+    A = rand(Normal(), m, n)
+
+    Random.seed!(seed+1)
+    x0 = rand(Normal(), n)
+    Random.seed!(seed+2)
+    optstructure = l1Manifold(rand(Bernoulli(1-sparsity), n))
+    x0 = project(optstructure, x0)
+
+    # measures are linear model + (unbiaised) noise
+    y = A*x0 + rand(Normal(0, δ^2), m)
+
+    return LeastsquaresPb(A, y, regularizer_l1(δ), n, x0, optstructure)
+end

@@ -4,7 +4,16 @@ Layout composite problems and associated oracles. The nonsmooth part is based on
 
 ## Implemented problems
 
-- least squares
+- least squares + l1 regularization
+    - `get_lasso_MLE`
+- logistic + l1 regularization
+    - `get_logit_MLE`
+- trace norm + l regularization
+    - `get_tracenorm_MLE`
+- inverse covariance selection
+- NMF
+
+
 
 ## Example: least-squares with l1 penalization.
 

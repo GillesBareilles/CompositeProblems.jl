@@ -81,13 +81,16 @@ export problem_dimension
 include("problems/Leastsquares.jl")
 include("problems/Logistic.jl")
 include("problems/Logistic_instances.jl")
+include("problems/Tracenorm.jl")
 
 include("utils_instances.jl")
 
 export LeastsquaresPb
-export get_random_qualifiedleastsquares, get_random_qualifiedlasso
+export get_random_qualifiedleastsquares, get_random_qualifiedlasso, get_lasso_MLE
 
 export LogisticPb
-export get_logit_ionosphere, get_logit_gisette, get_random_logit
+export get_logit_ionosphere, get_logit_gisette, get_random_logit, get_logit_MLE
 
+export TracenormPb
+export get_tracenorm_MLE
 end
