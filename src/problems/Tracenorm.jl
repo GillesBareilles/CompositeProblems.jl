@@ -34,10 +34,10 @@ function ∇f!(pb::TracenormPb, ∇f::AbstractMatrix, X::AbstractMatrix)
     return ∇f
 end
 
-function ∇f(pb::TracenormPb, x::AbstractVector)
-    X = reshape(pb, x)
-    return vec(sum( pb.A[i] * (dot(pb.A[i], X) - pb.y[i]) for i in 1:pb.m))
-end
+# function ∇f(pb::TracenormPb, x::AbstractVector)
+#     X = reshape(pb, x)
+#     return vec(sum( pb.A[i] * (dot(pb.A[i], X) - pb.y[i]) for i in 1:pb.m))
+# end
 
 # 2nd order
 ∇²f_h(pb::TracenormPb, X::AbstractMatrix, H::AbstractMatrix) = sum( pb.A[i] * dot(pb.A[i], H) for i in 1:pb.m)
@@ -50,11 +50,11 @@ function ∇²f_h!(pb::TracenormPb, ∇²f::AbstractMatrix, X::AbstractMatrix, H
 end
 
 
-function ∇²f_h(pb::TracenormPb, x::AbstractVector, h::AbstractVector)
-    X = reshape(pb, x)
-    H = reshape(pb, h)
-    return vec(sum( pb.A[i] * dot(pb.A[i], H) for i in 1:pb.m))
-end
+# function ∇²f_h(pb::TracenormPb, x::AbstractVector, h::AbstractVector)
+#     X = reshape(pb, x)
+#     H = reshape(pb, h)
+#     return vec(sum( pb.A[i] * dot(pb.A[i], H) for i in 1:pb.m))
+# end
 
 
 # conditioning

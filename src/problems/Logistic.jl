@@ -6,23 +6,23 @@
 #    y : R^m observations, *values -1 and 1*
 #    A : mxn matrix of samples
 
-mutable struct LogisticPb{Tr, Tm} <: CompositeProblem
+mutable struct LogisticPb{Tr, Tm, Txman} <: CompositeProblem
     A::Matrix{Float64}
     y::Vector{Float64}
     regularizer::Tr
     n::Int64
-    x0::Vector{Float64}
+    x0::Txman
     M_x0::Tm
     function LogisticPb(
             A::Matrix{Float64},
             y::Vector{Float64},
             regularizer::Tr,
             n::Int64,
-            x0::Vector{Float64},
+            x0::Txman,
             M_x0::Tm
-        ) where {Tr, Tm}
+        ) where {Tr, Tm, Txman}
         @assert Set(y) == Set([-1.0, 1.0]) "Logistic rhs vector shoudl take values -1.0, 1.0, here: $(Set(y))."
-        return new{Tr, Tm}(A, y, regularizer, n, x0, M_x0)
+        return new{Tr, Tm, Txman}(A, y, regularizer, n, x0, M_x0)
     end
 end
 

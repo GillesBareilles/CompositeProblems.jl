@@ -1,12 +1,12 @@
 ###############################################################################
 ## Least squares problem parametrized by regularizer reg
 #    min_x  0.5 * ||Ax-y||² + g(reg, x)
-struct LeastsquaresPb{Tr,Tm} <: CompositeProblem
+struct LeastsquaresPb{Tr, Tm, Txman} <: CompositeProblem
     A::Matrix{Float64}
     y::Vector{Float64}
     regularizer::Tr
     n::Int64
-    x0::Vector{Float64}
+    x0::Txman
     M_x0::Tm
 end
 
@@ -15,14 +15,14 @@ problem_dimension(pb::LeastsquaresPb) = pb.n
 ## f
 # 0th order
 f(pb::LeastsquaresPb, x) = 0.5 * norm(pb.A * x - pb.y)^2
-f(pb::LeastsquaresPb, x::AbstractMatrix) = f(pb, view(x, :))
+# f(pb::LeastsquaresPb, x::AbstractMatrix) = f(pb, view(x, :))
 
 # 1st order
 ∇f!(pb::LeastsquaresPb, res, x) = (res .= transpose(pb.A) * (pb.A * x - pb.y))
 ∇f(pb::LeastsquaresPb, x) = transpose(pb.A) * (pb.A * x - pb.y)
 
-∇f!(pb::LeastsquaresPb, res, x::AbstractMatrix) = ∇f!(pb, view(res, :), view(x, :))
-∇f(pb::LeastsquaresPb, x::AbstractMatrix) = reshape(transpose(pb.A) * (pb.A * view(x, :) - pb.y), size(x))
+# # ∇f!(pb::LeastsquaresPb, res, x::AbstractMatrix) = ∇f!(pb, view(res, :), view(x, :))
+# ∇f(pb::LeastsquaresPb, x::AbstractMatrix) = reshape(transpose(pb.A) * (pb.A * view(x, :) - pb.y), size(x))
 
 # 2nd order
 ∇²f_h!(pb::LeastsquaresPb, res, x, h) = (res .= transpose(pb.A) * (pb.A * h))
