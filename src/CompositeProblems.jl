@@ -9,6 +9,8 @@ using Distributions
 using DelimitedFiles
 using JLD
 
+using JuMP, Ipopt
+
 abstract type CompositeProblem end
 
 const instances_dir = joinpath(dirname(pathof(CompositeProblems)), "..", "instances")
@@ -85,6 +87,7 @@ include("problems/Logistic_instances.jl")
 include("problems/Tracenorm.jl")
 
 include("utils_instances.jl")
+include("optimality_checkers.jl")
 
 export LeastsquaresPb
 export get_random_qualifiedleastsquares, get_random_qualifiedlasso, get_lasso_MLE
@@ -94,4 +97,6 @@ export get_logit_ionosphere, get_logit_gisette, get_random_logit, get_logit_MLE
 
 export TracenormPb
 export get_tracenorm_MLE
+
+export firstorder_optimality_tangnorm
 end

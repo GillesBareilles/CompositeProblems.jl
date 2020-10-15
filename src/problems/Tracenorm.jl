@@ -1,23 +1,25 @@
 ###############################################################################
 ## Least squares with nuclear norm regularization
 #    min_x  0.5 Σᴹ (⟨Aᵢ, X⟩-yᵢ)² + λ ||X||_*
-struct TracenormPb{Tr, Tm} <: CompositeProblem
+struct TracenormPb{Tr, Tm, Txman} <: CompositeProblem
     A::Vector{Matrix{Float64}}
     y::Vector{Float64}
     n1::Int
     n2::Int                         # matrix variable, dimension (n1,n2)
     m::Int
     regularizer::Tr
-    x0::Matrix{Float64}
+    x0::Txman
     M_x0::Tm
 end
 
-problem_dimension(pb::TracenormPb) = pb.n1*pn.n2
+problem_dimension(pb::TracenormPb) = pb.n1*pb.n2
 
 # 0th order
 function f(pb::TracenormPb, X::AbstractMatrix)
     return 0.5 * sum( (dot(pb.A[i], X) - pb.y[i])^2 for i in 1:pb.m)
 end
+## TODO: improve this to use point structure.
+f(pb::TracenormPb, X::SVDMPoint) = f(pb, X.U*Diagonal(X.S)*X.Vt)
 
 # function f(pb::TracenormPb, x::AbstractVector)
 #     X = reshape(pb, x)
@@ -34,6 +36,10 @@ function ∇f!(pb::TracenormPb, ∇f::AbstractMatrix, X::AbstractMatrix)
     return ∇f
 end
 
+## TODO: improve this to account for point structure
+∇f(pb::TracenormPb, X::SVDMPoint) = ∇f(pb, X.U*Diagonal(X.S)*X.Vt)
+∇f!(pb::TracenormPb, res, X::SVDMPoint) = ∇f!(pb, res, X.U*Diagonal(X.S)*X.Vt)
+
 # function ∇f(pb::TracenormPb, x::AbstractVector)
 #     X = reshape(pb, x)
 #     return vec(sum( pb.A[i] * (dot(pb.A[i], X) - pb.y[i]) for i in 1:pb.m))
@@ -49,6 +55,10 @@ function ∇²f_h!(pb::TracenormPb, ∇²f::AbstractMatrix, X::AbstractMatrix, H
     return ∇²f
 end
 
+
+## TODO: improve this to account for point structure
+∇²f_h(pb::TracenormPb, X::SVDMPoint, H) = ∇²f_h(pb, X.U*Diagonal(X.S)*X.Vt, H)
+∇²f_h!(pb::TracenormPb, res, X::SVDMPoint, H) = ∇²f_h!(pb, res, X.U*Diagonal(X.S)*X.Vt, H)
 
 # function ∇²f_h(pb::TracenormPb, x::AbstractVector, h::AbstractVector)
 #     X = reshape(pb, x)
