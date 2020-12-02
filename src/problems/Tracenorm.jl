@@ -57,8 +57,8 @@ end
 
 
 ## TODO: improve this to account for point structure
-∇²f_h(pb::TracenormPb, X::SVDMPoint, H) = ∇²f_h(pb, X.U*Diagonal(X.S)*X.Vt, H)
-∇²f_h!(pb::TracenormPb, res, X::SVDMPoint, H) = ∇²f_h!(pb, res, X.U*Diagonal(X.S)*X.Vt, H)
+∇²f_h(pb::TracenormPb, X::SVDMPoint, H) = ∇²f_h(pb, X.U*Diagonal(X.S)*X.Vt, X.U * H.M * X.Vt + X.U * H.Vt + H.U * X.Vt)
+∇²f_h!(pb::TracenormPb, res, X::SVDMPoint, H) = ∇²f_h!(pb, res, X.U*Diagonal(X.S)*X.Vt, X.U * H.M * X.Vt + X.U * H.Vt + H.U * X.Vt)
 
 # function ∇²f_h(pb::TracenormPb, x::AbstractVector, h::AbstractVector)
 #     X = reshape(pb, x)

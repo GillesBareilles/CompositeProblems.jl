@@ -9,7 +9,7 @@ using Distributions
 using DelimitedFiles
 using JLD
 
-using JuMP, Ipopt
+using JuMP, MosekTools
 
 abstract type CompositeProblem end
 

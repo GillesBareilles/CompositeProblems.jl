@@ -47,7 +47,6 @@ function main()
 
     @show f(pb, x)
     @btime f($pb, $x)
-    # @time f(pb, x)
 
     println()
     println()
@@ -58,14 +57,12 @@ function main()
     @show norm(∇fx_AD), norm(∇fx_∇f)
     @show norm(∇fx_AD - ∇fx_∇f)
 
-    # @time ForwardDiff.gradient(x->f(pb, x), x)
     @btime CompositeProblems.∇f!($pb, $∇fx_∇f, $x)
 
     println()
     println()
     ∇²f_h_base = zeros(n)
     @btime CompositeProblems.∇²f_h!($pb, $∇²f_h_base, $x, $η)
-    @assert false
 
     ∇²f_h_ADhess = ForwardDiff.hessian(x->f(pb, x), x) * η
 
@@ -77,7 +74,7 @@ function main()
 
     @btime CompositeProblems.∇²f_h!($pb, $∇²f_h_base, $x, $η)
 
-    @assert false
+    # @assert false
     @btime CompositeProblems.∇²f_h!($pb, $∇²f_h_base, $x, $η)
 
     res = check_problem_smoothoracles(pb, x, η)
