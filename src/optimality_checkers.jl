@@ -3,7 +3,7 @@ function firstorder_optimality_tangnorm(pb::CompositeProblem, x, M, ∇f_x)
     if !isa(x, SVDMPoint)
         x_man = project(M, x)
     end
-    !is_manifold_point(M, x) && @warn "trouble here: !is manifold point"
+    !is_manifold_point(M, x) && @debug "trouble here: !is manifold point" x M
     return firstorder_optimality_tangnorm(pb::CompositeProblem, pb.regularizer, x_man, M, ∇f_x)
 end
 
@@ -76,7 +76,7 @@ end
 ### l1 regularizer
 #
 function firstorder_optimality_tangnorm(pb::CompositeProblem, regularizer::regularizer_l1, x, M, ∇f_x)
-    @time ḡ = compute_minnorm_subgradient(pb, regularizer, x, M, ∇f_x)
+    ḡ = compute_minnorm_subgradient(pb, regularizer, x, M, ∇f_x)
 
     fḡ_tangent = project(M, x, ∇f_x+ḡ)
     fḡ_normal = ∇f_x+ḡ - fḡ_tangent
@@ -120,8 +120,12 @@ dist_int_subdiff_l1(x, λ) = max(x-λ, -x-λ)
 #
 ### Nuclear regularizer
 #
-function firstorder_optimality_tangnorm(pb::CompositeProblem, ::regularizer_lnuclear, x, M::FixedRankMatrices{m,n,k}, ∇f_x) where {m,n,k}
+function firstorder_optimality_tangnorm(pb::CompositeProblem, regularizer::regularizer_lnuclear, x, M::FixedRankMatrices{m,n,k}, ∇f_x) where {m,n,k}
     #! normal component not implemented here.
-    return norm(x.U[1:k, :] * x.Vt[:, 1:k] + ∇f_x), -1
+
+    ḡ_tan = regularizer.λ .* x.U[:, 1:k] * x.Vt[1:k, :]
+    # fḡ_tangent = project(M, x, ∇f_x+ḡ_tan)
+
+    return norm(project(M, x, ∇f_x) + ḡ_tan), -1
 end
 
