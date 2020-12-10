@@ -128,4 +128,3 @@ function firstorder_optimality_tangnorm(pb::CompositeProblem, regularizer::regul
 
     return norm(project(M, x, ∇f_x) + ḡ_tan), -1
 end
-

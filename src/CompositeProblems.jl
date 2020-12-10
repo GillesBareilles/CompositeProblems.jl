@@ -15,6 +15,10 @@ abstract type CompositeProblem end
 
 const instances_dir = joinpath(dirname(pathof(CompositeProblems)), "..", "instances")
 
+function __init__()
+    !isdir(instances_dir) && mkdir(instances_dir)
+end
+
 ##
 function problem_dimension(pb::CompositeProblem)
     return error("problem_dimension not implemented for a problem $(typeof(pb)).")
@@ -86,6 +90,8 @@ include("problems/Logistic.jl")
 include("problems/Logistic_instances.jl")
 include("problems/Tracenorm.jl")
 
+include("problems/Adrian's_testfunction.jl")
+
 include("utils_instances.jl")
 include("optimality_checkers.jl")
 
@@ -97,6 +103,8 @@ export get_logit_ionosphere, get_logit_gisette, get_random_logit, get_logit_MLE
 
 export TracenormPb
 export get_tracenorm_MLE
+
+export quadmaxquadAL
 
 export firstorder_optimality_tangnorm
 end

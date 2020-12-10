@@ -2,56 +2,43 @@
 ## Adrian Lewis' OWOS problem
 #    min_(x,y) = 2x² + y² + |x²-y|
 
-struct ALfunction <: CompositeProblem
+struct quadmaxquadAL <: CompositeProblem
+    regularizer::maxquadAL
 end
 
-problem_dimension(pb::LogisticPb) = 2
+quadmaxquadAL() = quadmaxquadAL(maxquadAL())
+
+problem_dimension(::quadmaxquadAL) = 2
 
 ## f
 # 0th order
-f(pb::LogisticPb, x)
-    m = size(pb.A, 1)
-
-    Ax = pb.A * x
-    fval = 0.0
-    @inbounds @simd for i in 1:m
-        fval -= logsig(pb.y[i] * Ax[i])
-    end
-
-    return fval / m
+function f(::quadmaxquadAL, xy)
+    x, y = xy
+    return 2*x^2 + y^2
 end
 
 # 1st order
-σ(x) = 1/(1+exp(-x))
-function ∇f!(pb::LogisticPb, res, x)
-    m = size(pb.A, 1)
-
-    σyAx = pb.A * x
-    σyAx .*= -pb.y
-    σyAx .= σ.(σyAx)
-    res .= transpose(pb.A) * (σyAx .* pb.y)
-    res ./= -m
-
-    return res
+function ∇f!(::quadmaxquadAL, res, xy)
+    x, y = xy
+    return res .= [4x, 2y]
 end
 
 # 2nd order
-∇σ(x) = σ(x) * σ(-x)
-function ∇²f_h!(pb::LogisticPb, res, x, h)
-    m = size(pb.A, 1)
-
-    yAx = -pb.y .* (pb.A * x)
-    Ah = pb.A * h
-
-    res .= transpose(pb.A) * (Ah .* ∇σ.(yAx))
-    res ./= m
-
+function ∇²f_h!(::quadmaxquadAL, res, x, h)
+    res[1] = 4*h[1]
+    res[2] = 2*h[2]
     return res
 end
 
 # conditioning
-function get_gradlips(pb::LogisticPb)
-    m = size(pb.A, 1)
-    return opnorm(pb.A)^2 / m
+# get_gradlips(::quadmaxquadAL)
+# get_μ_cvx(::quadmaxquadAL) = (svdvals(pb.A)[end])^2
+
+function firstorder_optimality_tangnorm(pb::quadmaxquadAL, x, M::PlaneParabola, ∇f_x)
+    return norm(project(M, x, ∇f_x)), -1
 end
-# get_μ_cvx(pb::LogisticPb) = (svdvals(pb.A)[end])^2
+
+function firstorder_optimality_tangnorm(::quadmaxquadAL, x, M::Euclidean, ∇f_x)
+    ∇g_x = x[1]^2-x[2] > 0 ? [2*x[1], -1] : [-2*x[1], 1]
+    return norm(∇f_x + ∇g_x), -1
+end

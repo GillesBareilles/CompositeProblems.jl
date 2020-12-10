@@ -1,7 +1,6 @@
 function checkdownload_ionosphere()
     if !isfile(joinpath(instances_dir, "ionosphere.data"))
-        @show joinpath(instances_dir, "ionosphere.data")
-        println("Downloading ionosphere dataset to: ", pwd(), "...")
+                println("Downloading ionosphere dataset to: ", pwd(), "...")
 
         run(`wget https://archive.ics.uci.edu/ml/machine-learning-databases/ionosphere/ionosphere.data`)
 
