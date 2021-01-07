@@ -99,7 +99,7 @@ export LeastsquaresPb
 export get_random_qualifiedleastsquares, get_random_qualifiedlasso, get_lasso_MLE
 
 export LogisticPb
-export get_logit_ionosphere, get_logit_gisette, get_random_logit, get_logit_MLE
+export get_logit_ionosphere, get_logit_gisette, get_random_logit, get_logit_MLE, get_logit_MLE_elastic_net
 
 export TracenormPb
 export get_tracenorm_MLE

@@ -7,7 +7,7 @@ function get_logit_ionosphere(;λ=0.001)
 
     y = map(x-> x=="g" ? 1.0 : -1.0, rawdata[:, end])
 
-    return LogisticPb(A, y, regularizer_l1(λ), n, zeros(1), l1Manifold(zeros(1)))
+    return LogisticPb(A, y, regularizer_l1(λ), n, zeros(1), l1Manifold(zeros(1)), 0.0)
 end
 
 
@@ -41,11 +41,11 @@ function get_logit_gisette(λ = 6.67e-4)
         save(joinpath(instances_dir, "gisette_scale.jld"), "A", A, "y", y)
     end
 
-    return LogisticPb(A, y, regularizer_l1(λ), sampledim, zeros(1), l1Manifold(zeros(1)))
+    return LogisticPb(A, y, regularizer_l1(λ), sampledim, zeros(1), l1Manifold(zeros(1)), 0.0)
 end
 
 
-## Random sparse logit
+
 function get_random_logit(;n=80, m=85, sparsity=0.5, λ=0.1, seed=1234)
 
     Random.seed!(seed)
@@ -53,7 +53,7 @@ function get_random_logit(;n=80, m=85, sparsity=0.5, λ=0.1, seed=1234)
     Random.seed!(seed+3)
     y = Vector([rand() > sparsity ? 1.0 : -1.0 for i in 1:m])
 
-    return LogisticPb(A, y, regularizer_l1(λ), n, zeros(1), l1Manifold(zeros(1)))
+    return LogisticPb(A, y, regularizer_l1(λ), n, zeros(1), l1Manifold(zeros(1)), 0.0)
 end
 
 function get_logit_MLE(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01)
@@ -78,5 +78,30 @@ function get_logit_MLE(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01)
         end
     end
 
-    return LogisticPb(A, y, regularizer_l1(λ), n, x0, optstructure)
+    return LogisticPb(A, y, regularizer_l1(λ), n, x0, optstructure, 0.0)
+end
+
+function get_logit_MLE_elastic_net(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01, lambda2=0.02)
+    @assert 0 ≤ sparsity ≤ 1
+
+    Random.seed!(seed)
+    A = rand(Normal(), m, n)
+
+    Random.seed!(seed+1)
+    x0 = rand(Normal(), n)
+    Random.seed!(seed+2)
+    optstructure = l1Manifold(rand(Bernoulli(1-sparsity), n))
+    x0 = project(optstructure, x0)
+
+    y = zeros(m)
+    for i in 1:m
+        Random.seed!(seed+i)
+        if rand(Bernoulli(0.5+0.5*σ(dot(A[i, :], x0))))
+            y[i] = 1.0
+        else
+            y[i] = -1.0
+        end
+    end
+
+    return LogisticPb(A, y, regularizer_l1(λ), n, x0, optstructure, lambda2)
 end
