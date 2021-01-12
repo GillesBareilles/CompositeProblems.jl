@@ -56,7 +56,7 @@ function get_random_logit(;n=80, m=85, sparsity=0.5, λ=0.1, seed=1234)
     return LogisticPb(A, y, regularizer_l1(λ), n, zeros(1), l1Manifold(zeros(1)), 0.0)
 end
 
-function get_logit_MLE(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01)
+function get_logit_MLE(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01, diff=0.5)
     @assert 0 ≤ sparsity ≤ 1
 
     Random.seed!(seed)
@@ -71,7 +71,7 @@ function get_logit_MLE(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01)
     y = zeros(m)
     for i in 1:m
         Random.seed!(seed+i)
-        if rand(Bernoulli(σ(dot(A[i, :], x0))))
+        if rand(Bernoulli(diff + (1-diff)*σ(dot(A[i, :], x0))))
             y[i] = 1.0
         else
             y[i] = -1.0
@@ -81,7 +81,7 @@ function get_logit_MLE(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01)
     return LogisticPb(A, y, regularizer_l1(λ), n, x0, optstructure, 0.0)
 end
 
-function get_logit_MLE_elastic_net(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01, lambda2=0.02)
+function get_logit_MLE_elastic_net(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01, lambda2=0.02, diff=0.5)
     @assert 0 ≤ sparsity ≤ 1
 
     Random.seed!(seed)
@@ -96,7 +96,7 @@ function get_logit_MLE_elastic_net(;n=20, m=15, sparsity=0.5, seed=1234, λ=0.01
     y = zeros(m)
     for i in 1:m
         Random.seed!(seed+i)
-        if rand(Bernoulli(0.5+0.5*σ(dot(A[i, :], x0))))
+        if rand(Bernoulli(diff + (1-diff)*σ(dot(A[i, :], x0))))
             y[i] = 1.0
         else
             y[i] = -1.0
