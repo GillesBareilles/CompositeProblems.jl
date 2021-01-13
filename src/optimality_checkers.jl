@@ -8,14 +8,17 @@ function firstorder_optimality_tangnorm(pb::CompositeProblem, x, M, ∇f_x)
 end
 
 function compute_minnorm_subgradient(pb::CompositeProblem, regularizer, x, M, ∇f_x)
+    # model = Model(with_optimizer(
+    #     Mosek.Optimizer,
+    #     QUIET = true,
+    #     INTPNT_CO_TOL_REL_GAP = 1e-15,
+    #     INTPNT_CO_TOL_PFEAS = 1e-13,
+    #     INTPNT_CO_TOL_DFEAS = 1e-13,
+    # ))
+
     model = Model(with_optimizer(
-        Mosek.Optimizer,
-        QUIET = true,
-        INTPNT_CO_TOL_REL_GAP = 1e-15,
-        INTPNT_CO_TOL_PFEAS = 1e-13,
-        INTPNT_CO_TOL_DFEAS = 1e-13,
+        OSQP.Optimizer
     ))
-    # Model(optimizer_with_attributes(Mosek.Optimizer, "QUIET" => false, "INTPNT_CO_TOL_DFEAS" => 1e-7))
 
     ḡ_normal = model_g_subgradient!(model, regularizer, M, x)
     ḡ = build_subgradient_from_normalcomp(regularizer, M, x, ḡ_normal)
