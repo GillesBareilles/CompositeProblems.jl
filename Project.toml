@@ -16,6 +16,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StructuredProximalOperators = "622438d8-7036-4667-80f6-bb5000de1630"
 
 [compat]
+JLD = "0.12"
 julia = "1"
 
 [extras]
