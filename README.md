@@ -1,6 +1,6 @@
 # CompositeProblems
 
-Layout composite problems and associated oracles. The nonsmooth part is based on `StructuredProximalOperators`.
+Layout (additive) composite problems and associated oracles. The nonsmooth part is based on `StructuredProximalOperators`.
 
 ## Implemented problems
 
@@ -10,17 +10,15 @@ Layout composite problems and associated oracles. The nonsmooth part is based on
     - `get_logit_MLE`
 - trace norm + l regularization
     - `get_tracenorm_MLE`
-- inverse covariance selection
-- NMF
 
 
 
 ## Example: least-squares with l1 penalization.
 
 ```julia
-julia> using StructuredProximalOperators
+julia> using CompositeProblems
 julia> n, m, sparsity = 10, 8, 0.8
-julia> pb = get_random_qualifiedleastsquares(n, m, regularizer_l1(2.5), sparsity; seed = 1234);
+julia> pb = get_logit_MLE(n=n, m=m, sparsity=0.8);
 julia> x = rand(n);
 julia> h = rand(n);
 julia> res = zeros(n);
@@ -34,7 +32,6 @@ julia> ∇²f_h!(pb, res, x, h);
 julia> ∇²f_h(pb, x, h);
 
 julia> get_gradlips(pb);
-julia> get_μ_cvx(pb);
 ```
 
 ### About instances

@@ -16,7 +16,12 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StructuredProximalOperators = "622438d8-7036-4667-80f6-bb5000de1630"
 
 [compat]
+Distributions = "0.24"
 JLD = "0.12"
+JuMP = "0.21"
+Manifolds = "0.4"
+Mosek = "1.1"
+MosekTools = "0.9"
 julia = "1"
 
 [extras]

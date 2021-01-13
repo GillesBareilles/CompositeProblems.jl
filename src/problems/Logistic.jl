@@ -23,7 +23,7 @@ mutable struct LogisticPb{Tr, Tm, Txman} <: CompositeProblem
             M_x0::Tm,
             λ₂::Float64
         ) where {Tr, Tm, Txman}
-        @assert Set(y) == Set([-1.0, 1.0]) "Logistic rhs vector shoudl take values -1.0, 1.0, here: $(Set(y))."
+        @assert Set(y) ⊆ Set([-1.0, 1.0]) "Logistic rhs vector shoudl take values -1.0, 1.0, here: $(Set(y))."
         return new{Tr, Tm, Txman}(A, y, regularizer, n, x0, M_x0, λ₂)
     end
 end
